@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Voting System</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .teachers, .voted-teachers {
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .teacher-btn {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .teacher-btn:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+
+        .reset-notice {
+            text-align: center;
+            color: yellow;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Teacher Voting System</h1>
+
+        <h2>Available Teachers</h2>
+        <div id="teachers" class="teachers">
+            <!-- Teacher buttons will be inserted here -->
+        </div>
+
+        <h2>Voted Teachers</h2>
+        <div id="voted-teachers" class="voted-teachers">
+            <!-- Voted teachers will be displayed here -->
+        </div>
+
+        <div id="reset-notice" class="reset-notice"></div>
+    </div>
+
+    <script>
+        const teachers = [
+            'Ms. Sally O’Brien - Biology & Science',
+            'Ms. Sarah Ryan - Art',
+            'Mr. Coleman Quinn - Maths & English',
+            'Ms. Zoe O’Keeffe - Secretary',
+            'Ms. Julie O’Connor - Home Economics',
+            'Mr. Sweeney - English and Geography',
+            'Dominic O Sullivan',
+            'Patrick Drislane',
+            'Naoise O Sullivan',
+            'Claire Downey',
+            'Carol Carey',
+            'Ciarain Meade',
+            'Michael Walsh',
+            'Mairead Foley',
+            'Scott Fitzgerald',
+            'Treasa Moher'
+        ];
+
+        const teacherContainer = document.getElementById('teachers');
+        const votedTeacherContainer = document.getElementById('voted-teachers');
+        const resetNotice = document.getElementById('reset-notice');
+
+        const STORAGE_KEY = 'votedTeacher';
+        const RESET_HOUR = 8; // 8:00 AM reset time
+
+        function createTeacherButton(name) {
+            const btn = document.createElement('button');
+            btn.textContent = name;
+            btn.className = 'teacher-btn';
+            btn.onclick = () => voteTeacher(name);
+            return btn;
+        }
+
+        function voteTeacher(name) {
+            if (localStorage.getItem(STORAGE_KEY)) {
+                alert('Submission failed.');
+                return;
+            }
+
+            // Mark teacher as voted
+            localStorage.setItem(STORAGE_KEY, name);
+            displayTeachers();
+        }
+
+        function displayTeachers() {
+            teacherContainer.innerHTML = '';
+            votedTeacherContainer.innerHTML = '';
+
+            const votedTeacher = localStorage.getItem(STORAGE_KEY);
+
+            teachers.forEach(teacher => {
+                if (teacher === votedTeacher) {
+                    votedTeacherContainer.appendChild(createTeacherButton(teacher)).disabled = true;
+                } else {
+                    teacherContainer.appendChild(createTeacherButton(teacher));
+                }
+            });
+        }
+
+        function checkReset() {
+            const now = new Date();
+            const hours = now.getHours();
+
+            if (hours >= RESET_HOUR && localStorage.getItem(STORAGE_KEY)) {
+                localStorage.removeItem(STORAGE_KEY);
+                resetNotice.textContent = 'Votes have been reset for the day!';
+            } else {
+                resetNotice.textContent = '';
+            }
+        }
+
+        window.onload = () => {
+            checkReset();
+            displayTeachers();
+        };
+    </script>
+
+</body>
+</html>
